@@ -12,7 +12,7 @@ M = 5
 T = float(input("T_concentrarion:"))
 #Frametime = float(input(“frametime in millisecond”))
 #For future analysis
-frametime = 1
+frametime = 25
 Rx = np.zeros(3)
 dTRx = np.zeros(3)
 TRx = np.zeros(3)
@@ -21,7 +21,7 @@ Px = np.zeros(3)
 Frametime = frametime /1000
 #Reaction Engine In Loop
 Loops = 0
-while(Loops<3):
+while(Loops<800):
 	Loops = Loops + 1
 	RxA = np.arange(Rx.size)
 	dTRxA = np.arange(dTRx.size)
@@ -126,3 +126,8 @@ while(Loops<3):
 			Rx[0] = Rx[0] + R32n[a]*Frametime
 			T = T + R32n[a]*Frametime
 			TRx[a] = TRx[a]+ R32n[a]*Frametime
+	if Loops%400 == 0:
+		lup = str(int(Loops/400))
+		fioname= "system_"+lup+".txt"
+		open(fioname , mode = 'w')
+		np.savetxt (fioname,Rx)
