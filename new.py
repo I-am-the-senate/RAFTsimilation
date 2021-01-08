@@ -85,16 +85,16 @@ while(Loops<800):
 		 I = I - R11*Frametime
 		 Rx[0] = Rx[0] + R11*Frametime*2
 	for a in RxA:
-		 if  P21n[a] > 0 :
+		 if  P21n[a] > 0 and R21n[a] * Frametime>0:
 			 Rx[a] -= R21n[a] * Frametime
 			 M = M - R21n[a]*Frametime
 			 Rx[a+1] = Rx[a+1] +R21n[a]*Frametime
-		 if P31n[a] > 0 and Rx[a]>0:
+		 if P31n[a] > 0 and Rx[a] - R31n[a]*Frametime>0:
 			 Rx[a] = Rx[a] - R31n[a]*Frametime
 			 T = T - R31n[a]*Frametime
 			 dTRx[a] = dTRx[a] + R31n[a]*Frametime
 		 for b in TRxA:
-				if P41n[b,a] > 0 :
+				if P41n[b,a] > 0 and Rx[a] - R41n [b,a] *Frametime>0:
 					Rx[a] = Rx[a] - R41n [b,a] *Frametime
 					TRx[b] = TRx[b] - R41n [b,a] *Frametime
 					RmTRx[b,a] = RmTRx[b,a] + R41n [b,a] *Frametime
@@ -109,11 +109,9 @@ while(Loops<800):
 					 if P53n[b,a,c] > 0 :
 						 RmTRx[b,a] -= R53n[b,a,c]*Frametime
 						 Px[a+b+c] += R53n[b,a,c]*Frametime
-					 if P51n[a,c] > 0:
-						 Rx[a] = Rx[a] - R51n[a,c]*Frametime
-						 Rx[c] = Rx[c] - R51n[a,c]*Frametime
-						 Rx[a] = Rx[a] - R51n[a,c]*Frametime
-						 Rx[c] = Rx[c] - R51n[a,c]*Frametime
+					 if P51n[a,c] > 0 and Rx[a] - R51n[a,c]*Frametime*2>0:
+						 Rx[a] = Rx[a] - R51n[a,c]*Frametime*2
+						 Rx[c] = Rx[c] - R51n[a,c]*Frametime*2
 						 Px[a+c] = Px[a+c] - R51n[a,c]*Frametime
 						 Px[c] = Px[c] - R51n[a,c]*Frametime
 						 Px[a] = Px[a] - R51n[a,c]*Frametime
