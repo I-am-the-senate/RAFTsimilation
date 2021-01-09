@@ -3,6 +3,7 @@
 #Simillation of RAFT polymerizaion
 import numpy as np
 from numpy import random
+import math
 #from pyculib import rand as random
 from multiprocessing.dummy import Pool as ThreadPool
 pool = ThreadPool()
@@ -18,12 +19,11 @@ dTRx = np.zeros(3)
 TRx = np.zeros(3)
 RmTRx = np.zeros((3,3), dtype = float)
 Px = np.zeros(3)
-Frametime = frametime /1000
 #Reaction Engine In Loop
 tensec = 10000/frametime
-Loops = 0
-while(Loops<4000):
-	Loops = Loops + 1
+time = 0
+while(time<3600):
+	Rand = random.rand()
 	RxA = np.arange(Rx.size)
 	dTRxA = np.arange(dTRx.size)
 	TRxA = np.arange(TRx.size)
@@ -71,7 +71,6 @@ while(Loops<4000):
 	if np.size(Px) < np.size(RmTRx)+np.size(Rx):
 		Px =  np.append(Px,0)
 	#Px
-	Rand = random.rand()
 	Rtotal = R11 + R21 + R31 + R32*2 + R41 + R42*2 + R51*2 + R53*2
 	P11  = R11/Rtotal  - Rand
 	P21n = R21n/Rtotal - Rand
@@ -82,6 +81,8 @@ while(Loops<4000):
 	P51n = R51n/Rtotal - Rand
 	P53n = R53n/Rtotal - Rand
 	#1.1
+	Frametime = Rtotal*math.log(1/Rand)
+	time = time + Frametime
 	if P11 >= 0 :
 		 I = I - R11*Frametime
 		 Rx[0] = Rx[0] + R11*Frametime*2
@@ -126,8 +127,8 @@ while(Loops<4000):
 			T = T + R32n[a]*Frametime
 			TRx[a] = TRx[a]+ R32n[a]*Frametime
 			'''
-	if Loops%tensec == 0:
-		lup = str(int(Loops/tensec))
+	if int(time)%10 == 0:
+		lup = str(int(time)/10)
 		fioname= "system_"+lup+".txt"
 		open(fioname , mode = 'w')
 		np.savetxt (fioname,Rx)
