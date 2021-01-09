@@ -12,7 +12,7 @@ M = 5
 T = float(input("T_concentrarion:"))
 #Frametime = float(input(“frametime in millisecond”))
 #For future analysis
-frametime = 25
+frametime = 200
 Rx = np.zeros(3)
 dTRx = np.zeros(3)
 TRx = np.zeros(3)
@@ -20,8 +20,9 @@ RmTRx = np.zeros((3,3), dtype = float)
 Px = np.zeros(3)
 Frametime = frametime /1000
 #Reaction Engine In Loop
+tensec = 10000/frametime
 Loops = 0
-while(Loops<800):
+while(Loops<4000):
 	Loops = Loops + 1
 	RxA = np.arange(Rx.size)
 	dTRxA = np.arange(dTRx.size)
@@ -55,7 +56,7 @@ while(Loops<800):
 	#4.2/4.3
 	R42n = 500 * RmTRx
 	R42 = np.sum (R42n)
-	if Rx[-1] != 0:
+	if Rx[-1] > 0:
 		Rx = np.append(Rx,0)
 	if np.size(dTRx)<np.size(Rx):
 		dTRx = np.append(dTRx, np.zeros(np.size(Rx)-np.size(dTRx)))
@@ -85,16 +86,16 @@ while(Loops<800):
 		 I = I - R11*Frametime
 		 Rx[0] = Rx[0] + R11*Frametime*2
 	for a in RxA:
-		 if  P21n[a] > 0 :
-			 Rx[a] -= R21n[a] * Frametime
+		 if  P21n[a] > 0 and R21n[a] * Frametime>0:
+			 Rx[a] = Rx[a]-R21n[a] * Frametime
 			 M = M - R21n[a]*Frametime
 			 Rx[a+1] = Rx[a+1] +R21n[a]*Frametime
-		 if P31n[a] > 0 and Rx[a]>0:
+		 if P31n[a] > 0 and Rx[a] - R31n[a]*Frametime>0:
 			 Rx[a] = Rx[a] - R31n[a]*Frametime
 			 T = T - R31n[a]*Frametime
 			 dTRx[a] = dTRx[a] + R31n[a]*Frametime
 		 for b in TRxA:
-				if P41n[b,a] > 0 :
+				if P41n[b,a] > 0 and Rx[a] - R41n [b,a] *Frametime>0:
 					Rx[a] = Rx[a] - R41n [b,a] *Frametime
 					TRx[b] = TRx[b] - R41n [b,a] *Frametime
 					RmTRx[b,a] = RmTRx[b,a] + R41n [b,a] *Frametime
@@ -107,13 +108,11 @@ while(Loops<800):
 					TRx[a] = TRx[a] + R41n [b,a] *Frametime
 				for c in RxA:
 					 if P53n[b,a,c] > 0 :
-						 RmTRx[b,a] -= R53n[b,a,c]*Frametime
-						 Px[a+b+c] += R53n[b,a,c]*Frametime
-					 if P51n[a,c] > 0:
-						 Rx[a] = Rx[a] - R51n[a,c]*Frametime
-						 Rx[c] = Rx[c] - R51n[a,c]*Frametime
-						 Rx[a] = Rx[a] - R51n[a,c]*Frametime
-						 Rx[c] = Rx[c] - R51n[a,c]*Frametime
+						 RmTRx[b,a] = RmTRx[b,a]  - R53n[b,a,c]*Frametime
+						 Px[a+b+c] =Px[a+b+c]+ R53n[b,a,c]*Frametime
+					 if P51n[a,c] > 0 and Rx[a] - R51n[a,c]*Frametime*2>0:
+						 Rx[a] = Rx[a] - R51n[a,c]*Frametime*2
+						 Rx[c] = Rx[c] - R51n[a,c]*Frametime*2
 						 Px[a+c] = Px[a+c] - R51n[a,c]*Frametime
 						 Px[c] = Px[c] - R51n[a,c]*Frametime
 						 Px[a] = Px[a] - R51n[a,c]*Frametime
@@ -126,8 +125,10 @@ while(Loops<800):
 			Rx[0] = Rx[0] + R32n[a]*Frametime
 			T = T + R32n[a]*Frametime
 			TRx[a] = TRx[a]+ R32n[a]*Frametime
-	if Loops%400 == 0:
-		lup = str(int(Loops/400))
+			'''
+	if Loops%tensec == 0:
+		lup = str(int(Loops/tensec))
 		fioname= "system_"+lup+".txt"
 		open(fioname , mode = 'w')
 		np.savetxt (fioname,Rx)
+'''	
